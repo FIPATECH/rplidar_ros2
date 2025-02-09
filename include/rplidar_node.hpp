@@ -27,6 +27,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 #ifndef RPLIDAR_NODE_HPP_
 #define RPLIDAR_NODE_HPP_
 
@@ -51,86 +52,90 @@
 
 namespace
 {
-using LaserScan = sensor_msgs::msg::LaserScan;
-using LaserScanPub = rclcpp::Publisher<LaserScan>::SharedPtr;
-using StartMotorService = rclcpp::Service<std_srvs::srv::Empty>::SharedPtr;
-using StopMotorService = rclcpp::Service<std_srvs::srv::Empty>::SharedPtr;
-using RPlidarDriver = rp::standalone::rplidar::RPlidarDriver;
-using RplidarScanMode = rp::standalone::rplidar::RplidarScanMode;
-using Clock = rclcpp::Clock::SharedPtr;
-using ResponseNodeArray = std::unique_ptr<rplidar_response_measurement_node_hq_t[]>;
-using EmptyRequest = std::shared_ptr<std_srvs::srv::Empty::Request>;
-using EmptyResponse = std::shared_ptr<std_srvs::srv::Empty::Response>;
-using Timer = rclcpp::TimerBase::SharedPtr;
-using namespace std::chrono_literals;
+  using LaserScan = sensor_msgs::msg::LaserScan;
+  using LaserScanPub = rclcpp::Publisher<LaserScan>::SharedPtr;
+  using StartMotorService = rclcpp::Service<std_srvs::srv::Empty>::SharedPtr;
+  using StopMotorService = rclcpp::Service<std_srvs::srv::Empty>::SharedPtr;
+  using RPlidarDriver = rp::standalone::rplidar::RPlidarDriver;
+  using RplidarScanMode = rp::standalone::rplidar::RplidarScanMode;
+  using Clock = rclcpp::Clock::SharedPtr;
+  using ResponseNodeArray = std::unique_ptr<rplidar_response_measurement_node_hq_t[]>;
+  using EmptyRequest = std::shared_ptr<std_srvs::srv::Empty::Request>;
+  using EmptyResponse = std::shared_ptr<std_srvs::srv::Empty::Response>;
+  using Timer = rclcpp::TimerBase::SharedPtr;
+  using namespace std::chrono_literals;
 }
 
-namespace rplidar_ros
+namespace rplidar_ros2
 {
 
-constexpr double deg_2_rad(double x)
-{
-  return x * M_PI / 180.0;
-}
+  constexpr double deg_2_rad(double x)
+  {
+    return x * M_PI / 180.0;
+  }
 
-static float getAngle(const rplidar_response_measurement_node_hq_t & node)
-{
-  return node.angle_z_q14 * 90.f / 16384.f;
-}
+  static float getAngle(const rplidar_response_measurement_node_hq_t &node)
+  {
+    return node.angle_z_q14 * 90.f / 16384.f;
+  }
 
-class RPLIDAR_ROS_PUBLIC rplidar_node : public rclcpp::Node
-{
-public:
-  explicit rplidar_node(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
-  virtual ~rplidar_node();
+  class RPLIDAR_ROS_PUBLIC rplidar_node : public rclcpp::Node
+  {
+  public:
+    explicit rplidar_node(const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
+    virtual ~rplidar_node();
 
-  void publish_scan(const double scan_time, ResponseNodeArray nodes, size_t node_count);
+    void publish_scan(const double scan_time, ResponseNodeArray nodes, size_t node_count);
 
-  /* service callbacks */
-  void stop_motor(const EmptyRequest req, EmptyResponse res);
-  void start_motor(const EmptyRequest req, EmptyResponse res);
+    /* Service callbacks */
+    void stop_motor(const EmptyRequest req, EmptyResponse res);
+    void start_motor(const EmptyRequest req, EmptyResponse res);
 
-private:
-  bool getRPLIDARDeviceInfo() const;
-  bool checkRPLIDARHealth() const;
-  bool set_scan_mode();
-  void publish_loop();
-  void start();
-  void stop();
+  private:
+    bool getRPLIDARDeviceInfo() const;
+    bool checkRPLIDARHealth() const;
+    bool set_scan_mode();
+    void publish_loop();
 
-  /* parameters */
-  std::string channel_type_;
-  std::string tcp_ip_;
-  std::string serial_port_;
-  std::string topic_name_;
-  int tcp_port_;
-  int serial_baudrate_;
-  std::string frame_id_;
-  bool inverted_;
-  bool angle_compensate_;
-  bool flip_x_axis_;
-  int m_angle_compensate_multiple;
-  std::string scan_mode_;
-  bool auto_standby_;
-  /* Publisher */
-  LaserScanPub m_publisher;
-  /* Services */
-  StopMotorService m_stop_motor_service;
-  StartMotorService m_start_motor_service;
-  /* SDK Pointer */
-  RPlidarDriver * m_drv = nullptr;
-  /* Timer */
-  Timer m_timer;
-  /* Scan Times */
-  size_t m_scan_count = 0;
-  double max_distance = 8.0f;
-  double angle_min = deg_2_rad(0);
-  double angle_max = deg_2_rad(359);
-  const float min_distance = 0.15f;
-  /* State */
-  bool m_running = false;
-};
+    /* Parameters */
+    std::string channel_type_;
+    std::string tcp_ip_;
+    std::string serial_port_;
+    std::string topic_name_;
+    int tcp_port_;
+    int serial_baudrate_;
+    std::string frame_id_;
+    bool inverted_;
+    bool angle_compensate_;
+    bool flip_x_axis_;
+    int m_angle_compensate_multiple;
+    std::string scan_mode_;
 
-}  // namespace rplidar_ros
+    /* Auto-standby */
+    bool auto_standby_;
+    bool is_scanning_;
 
-#endif  // RPLIDAR_NODE_HPP_
+    /* Publisher */
+    LaserScanPub m_publisher;
+
+    /* Services */
+    StopMotorService m_stop_motor_service;
+    StartMotorService m_start_motor_service;
+
+    /* SDK Pointer */
+    RPlidarDriver *m_drv = nullptr;
+
+    /* Timer */
+    Timer m_timer;
+
+    /* Scan Times */
+    size_t m_scan_count = 0;
+    double max_distance = 8.0f;
+    double angle_min = deg_2_rad(0);
+    double angle_max = deg_2_rad(359);
+    const float min_distance = 0.15f;
+  };
+
+} // namespace rplidar_ros2
+
+#endif // RPLIDAR_NODE_HPP_
