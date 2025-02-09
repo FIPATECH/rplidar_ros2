@@ -1,174 +1,54 @@
-# RPLIDAR ROS package
+# RPLIDAR ROS2 package
 
-ROS node and test application for RPLIDAR
+ROS2 node and test application for RPLIDAR
 
-Visit following Website for more details about RPLIDAR:
+***Note:*** I just made some changes to update this package for ROS2 compatibility, modifying the original `rplidar_ros` repository for use with my RPLIDAR A2M8 on a Jetson Nano.
 
-rplidar roswiki: <http://wiki.ros.org/rplidar>
+For more details about RPLIDAR, please visit:
 
-rplidar HomePage: <http://www.slamtec.com/en/Lidar>
+- **rplidar roswiki:** [http://wiki.ros.org/rplidar](http://wiki.ros.org/rplidar)
+- **RPLIDAR HomePage:** [http://www.slamtec.com/en/Lidar](https://www.slamtec.com/en/Lidar/A2)
+- **RPLIDAR SDK:** [https://github.com/Slamtec/rplidar_sdk](https://github.com/Slamtec/rplidar_sdk)
+- **RPLIDAR Tutorial:** [https://github.com/robopeak/rplidar_ros/wiki](https://github.com/robopeak/rplidar_ros/wiki)
 
-rplidar SDK: <https://github.com/Slamtec/rplidar_sdk>
+## How to build the package
 
-rplidar Tutorial: <https://github.com/robopeak/rplidar_ros/wiki>
+1. **Clone the repository**
 
-## How to build rplidar ros package
+   Clone this project into the `src` folder of your colcon workspace:
 
-   1) Clone this project to your catkin's workspace src folder
-   2) Running catkin_make to build rplidarNode and rplidarNodeClient
+   ```bash
+   cd [your-ros-package-directory]/src
+   git clone https://github.com/FIPATECH/rplidar_ros2.git
+   ```
 
-## How to run rplidar ros package
+2. **Install ROS2 and Colcon**
 
-There're two ways to run rplidar ros package
+   Make sure you have ROS2 (installed with the necessary build tools (colcon, etc.).
 
-### I. Run rplidar node and view in the rviz
+3. **Build the package**
 
-The command for RPLIDAR A1 is :
+   ```bash
+   cd [your-ros-package-directory]
+   colcon build --symlink-install
+   source ./install/setup.bash
+   ```
 
-```bash
-roslaunch rplidar_ros view_rplidar_a1.launch
-```
+4. **Verify the package exists**
 
-The command for RPLIDAR A2M7 is :
+   ```bash
+   ros2 pkg list | grep rplidar_ros2
+   ```
 
-```bash
-roslaunch rplidar_ros view_rplidar_a2m7.launch
-```
+## Running the node and visualizing in RViz
 
-The command for RPLIDAR A2M8 is :
-
-```bash
-roslaunch rplidar_ros view_rplidar_a2m8.launch
-```
-
-The command for RPLIDAR A2M12 is :
-
-```bash
-roslaunch rplidar_ros view_rplidar_a2m12.launch
-```
-
-The command for RPLIDAR A3 is :
+To launch the RPLIDAR node along with RViz, run:
 
 ```bash
-roslaunch rplidar_ros view_rplidar_a3.launch
+ros2 launch rplidar_ros2 view_rplidar_launch.py
 ```
 
-The command for RPLIDAR S1 is :
+***Notice:*** The default parameters are set for RPLIDAR A2M8 with a **115200** baud rate. If using a different model, adjust the baud rate and other relevant parameters in the launch files accordingly.
 
-```bash
-roslaunch rplidar_ros view_rplidar_s1.launch
-```
-
-The command for RPLIDAR S2 is :
-
-```bash
-roslaunch rplidar_ros view_rplidar_s2.launch
-```
-
-The command for RPLIDAR S3 is :
-
-```bash
-roslaunch rplidar_ros view_rplidar_s3.launch
-```
-
-The command for RPLIDAR S2E is :
-
-```bash
-roslaunch rplidar_ros view_rplidar_s2e.launch
-```
-
-The command for RPLIDAR T1 is :
-
-```bash
-roslaunch rplidar_ros view_rplidar_t1.launch
-```
-
-The command for RPLIDAR C1 is :
-
-```bash
-roslaunch rplidar_ros view_rplidar_c1.launch
-```
-
-You should see rplidar's scan result in the rviz.
-
-### II. Run rplidar node and view using test application
-
-The command for RPLIDAR A1 is :
-
-```bash
-roslaunch rplidar_ros rplidar_a1.launch
-```
-
-The command for RPLIDAR A2M7 is :
-
-```bash
-roslaunch rplidar_ros rplidar_a2m7.launch
-```
-
-The command for RPLIDAR A2M8 is :
-
-```bash
-roslaunch rplidar_ros rplidar_a2m8.launch
-```
-
-The command for RPLIDAR A2M12 is :
-
-```bash
-roslaunch rplidar_ros rplidar_a2m12.launch
-```
-
-The command for RPLIDAR A3 is :
-
-```bash
-roslaunch rplidar_ros rplidar_a3.launch
-```
-
-The command for RPLIDAR S1 is :
-
-```bash
-roslaunch rplidar_ros rplidar_s1.launch
-```
-
-The command for RPLIDAR S2 is :
-
-```bash
-roslaunch rplidar_ros rplidar_s2.launch
-```
-
-The command for RPLIDAR S3 is :
-
-```bash
-roslaunch rplidar_ros rplidar_s3.launch
-```
-
-The command for RPLIDAR S2E is :
-
-```bash
-roslaunch rplidar_ros rplidar_s2e.launch
-```
-
-The command for RPLIDAR T1 is :
-
-```bash
-roslaunch rplidar_ros rplidar_t1.launch
-```
-
-The command for RPLIDAR C1 is :
-
-```bash
-roslaunch rplidar_ros rplidar_c1.launch
-```
-
-and in another terminal, run the following command
-
-```bash
-rosrun rplidar_ros rplidarNodeClient
-```
-
-You should see rplidar's scan result in the console.
-
-Notice: different lidar use different serial_baudrate.
-
-## RPLidar frame
-
-RPLidar frame must be broadcasted according to picture shown in rplidar-frame.png
+## RPLidar frame  
+The RPLidar frame should be broadcasted as shown in *rplidar_AX.png*.
