@@ -48,7 +48,9 @@
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
 #endif
 
+#ifndef M_PI
 #define M_PI 3.1415926535897932384626433832795
+#endif
 
 namespace
 {
