@@ -8,16 +8,13 @@ endif()
 
 # Enable strict compile options for GCC/Clang
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -pedantic)
+  add_compile_options(-Wall -Wextra -pedantic -Wno-pedantic)
 endif()
 
-# Set the build type to Release
-set(CMAKE_BUILD_TYPE "Release")
+# Define the path to the RPLIDAR SDK
+set(RPLIDAR_SDK_PATH "./sdk/")
 
-# Define the path to the RPLIDAR SDK (located in the sdk/ folder)
-set(RPLIDAR_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/sdk")
-
-# Retrieve the SDK source files from various directories
+# Collect all source files from the RPLIDAR SDK
 file(GLOB RPLIDAR_SDK_SRC
   "${RPLIDAR_SDK_PATH}/src/arch/linux/*.cpp"
   "${RPLIDAR_SDK_PATH}/src/hal/*.cpp"
@@ -26,67 +23,66 @@ file(GLOB RPLIDAR_SDK_SRC
 
 # List the required ROS2 dependencies
 set(req_deps
-  rclcpp
-  sensor_msgs
-  std_srvs
-  rclcpp_components
+  "rclcpp"
+  "sensor_msgs"
+  "std_srvs"
+  "rclcpp_components"
 )
 
 # Find and configure ament packages
 find_package(ament_cmake_auto REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
+
+# Automatically find and include required ROS2 dependencies
 ament_auto_find_build_dependencies(REQUIRED ${req_deps})
 
 # Include directories for the SDK and local headers
 include_directories(
   ${RPLIDAR_SDK_PATH}/include
   ${RPLIDAR_SDK_PATH}/src
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/src
+  include
 )
 
-# Build the composition node library from the node source and SDK sources
-add_library(rplidar_composition_node SHARED
+# Build the shared library for the rplidar_node component (ROS2 node)
+add_library(rplidar_node_node SHARED
   src/rplidar_node.cpp
   ${RPLIDAR_SDK_SRC}
 )
-ament_target_dependencies(rplidar_composition_node ${req_deps})
-rclcpp_components_register_nodes(rplidar_composition_node "rplidar_ros2::rplidar_node")
 
-# Build the standalone executable using the composition node library
-ament_auto_add_executable(rplidar_standalone src/rplidar_standalone.cpp)
-target_link_libraries(rplidar_standalone rplidar_composition_node)
-ament_target_dependencies(rplidar_standalone ${req_deps})
+# Link the rplidar_node library with the required dependencies
+ament_target_dependencies(rplidar_node_node ${req_deps})
 
-# Build the client executable (optional, as present in the project structure)
-ament_auto_add_executable(rplidar_client src/rplidar_client.cpp)
-target_link_libraries(rplidar_client rplidar_composition_node)
-ament_target_dependencies(rplidar_client ${req_deps})
+# Register the rplidar_node component so it can be used in ROS2 composition
+rclcpp_components_register_nodes(rplidar_node_node "rplidar_ros2::rplidar_node")
 
-# Install the executables
+# Build the standalone executable for the rplidar node
+ament_auto_add_executable(rplidar_node src/rplidar_standalone.cpp)
+
+# Link the standalone executable to the rplidar_node component library
+target_link_libraries(rplidar_node rplidar_node_node)
+
+# Link the required ROS2 dependencies
+ament_target_dependencies(rplidar_node ${req_deps})
+
+# Install the standalone executable
 install(
-  TARGETS rplidar_standalone rplidar_client
+  TARGETS rplidar_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# Install the composition node library
+# Install the launch and RViz configuration files
 install(
-  TARGETS rplidar_composition_node
+  DIRECTORY launch rviz
+  DESTINATION share/${PROJECT_NAME}
+)
+
+# Install the rplidar_node shared library (component)
+install(
+  TARGETS rplidar_node_node
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
 
-# Install the launch, rviz, and scripts directories
-install(
-  DIRECTORY launch rviz scripts
-  DESTINATION share/${PROJECT_NAME}
-)
-
-# Install public header files
-install(
-  DIRECTORY include/
-  DESTINATION include
-)
-
+# Finalize the ament package configuration
 ament_auto_package()
