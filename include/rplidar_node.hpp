@@ -113,6 +113,9 @@ namespace rplidar_ros2
     int m_angle_compensate_multiple;
     std::string scan_mode_;
 
+    /* Motor speed */
+    int motor_pwm;
+
     /* Auto-standby */
     bool auto_standby_;
     bool is_scanning_;

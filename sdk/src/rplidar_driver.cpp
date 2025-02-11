@@ -2177,6 +2177,9 @@ u_result RPlidarDriverImplCommon::setMotorPWM(_u16 pwm)
     if (_isTofLidar) return RESULT_OPERATION_NOT_SUPPORT;
     u_result ans;
     rplidar_payload_motor_pwm_t motor_pwm;
+
+    if (pwm > MAX_MOTOR_PWM) pwm = MAX_MOTOR_PWM;
+
     motor_pwm.pwm_value = pwm;
 
     {
@@ -2203,11 +2206,11 @@ u_result RPlidarDriverImplCommon::setLidarSpinSpeed(_u16 rpm, _u32 timeout)
     return RESULT_OK;
 }
 
-u_result RPlidarDriverImplCommon::startMotor()
+u_result RPlidarDriverImplCommon::startMotor(_u16 pwm)
 {
     if (!_isTofLidar) {
         if (_isSupportingMotorCtrl) { // RPLIDAR A2
-            setMotorPWM(DEFAULT_MOTOR_PWM);
+            setMotorPWM(pwm);
             delay(500);
             return RESULT_OK;
         }
