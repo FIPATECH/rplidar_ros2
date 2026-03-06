@@ -6,10 +6,7 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)
 endif()
 
-# Enable strict compile options for GCC/Clang
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -pedantic -Wno-pedantic)
-endif()
+# Keep vendor SDK compilation permissive to avoid noisy third-party warnings.
 
 # Define the path to the RPLIDAR SDK
 set(RPLIDAR_SDK_PATH "./sdk/")
@@ -85,4 +82,4 @@ install(
 )
 
 # Finalize the ament package configuration
-ament_auto_package()
+ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR)
