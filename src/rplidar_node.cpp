@@ -51,13 +51,13 @@ namespace rplidar_ros2
     channel_type_ = this->declare_parameter("channel_type", "serial");
     tcp_ip_ = this->declare_parameter("tcp_ip", "192.168.0.7");
     tcp_port_ = this->declare_parameter("tcp_port", 20108);
-    serial_port_ = this->declare_parameter("serial_port", std::string("/dev/ttyUSB0"));
-    serial_baudrate_ = this->declare_parameter("serial_baudrate", 115200);
+    serial_port_ = this->declare_parameter("serial_port", std::string("/dev/yeti/rplidar_top"));
+    serial_baudrate_ = this->declare_parameter("serial_baudrate", 256000);
     frame_id_ = this->declare_parameter("frame_id", std::string("laser_frame"));
     inverted_ = this->declare_parameter("inverted", false);
     angle_compensate_ = this->declare_parameter("angle_compensate", false);
     flip_x_axis_ = this->declare_parameter("flip_x_axis", false);
-    scan_mode_ = this->declare_parameter("scan_mode", std::string());
+    scan_mode_ = this->declare_parameter("scan_mode", std::string("Sensitivity"));
     topic_name_ = this->declare_parameter("topic_name", std::string("scan"));
     motor_pwm = this->declare_parameter("motor_pwm", DEFAULT_MOTOR_PWM);
 
